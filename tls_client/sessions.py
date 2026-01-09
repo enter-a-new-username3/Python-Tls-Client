@@ -28,15 +28,15 @@ class Session:
         cert_compression_algos: Optional[list[str]] = None,
         alpn_protocols: Optional[list[str]] = None,
         alps_protocols: Optional[list[str]] = None,
-        additional_decode: str = None,
+        additional_decode: Optional[str] = None,
         pseudo_header_order: Optional[List[str]] = None,
         connection_flow: Optional[int] = None,
         priority_frames: Optional[list] = None,
         header_priority: Optional[List[str]] = None,
-        random_tls_extension_order: Optional = False,
-        force_http1: Optional = False,
-        catch_panics: Optional = False,
-        debug: Optional = False,
+        random_tls_extension_order: Optional[bool] = False,
+        force_http1: Optional[bool] = False,
+        catch_panics: Optional[bool] = False,
+        debug: Optional[bool] = False,
         certificate_pinning: Optional[Dict[str, List[str]]] = None,
     ) -> None:
         self._session_id = str(uuid.uuid4())
@@ -401,8 +401,7 @@ class Session:
         # --- Request --------------------------------------------------------------------------------------------------
         is_byte_request = isinstance(request_body, (bytes, bytearray))
         header_order = list(headers.keys())
-        if "Content-Length" in headers:
-            headers.pop("Content-Length")
+        headers = {k: v for k, v in headers.items() if v is not None}
         request_payload = {
             "sessionId": self._session_id,
             "followRedirects": allow_redirects,
@@ -410,7 +409,7 @@ class Session:
             "withDebug": self.debug,
             "catchPanics": self.catch_panics,
             "headers": dict(headers),
-            "headerOrder": self.header_order,
+            "headerOrder": header_order,
             "insecureSkipVerify": insecure_skip_verify,
             "isByteRequest": is_byte_request,
             "additionalDecode": self.additional_decode,
