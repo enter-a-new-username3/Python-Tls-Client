@@ -444,8 +444,6 @@ class Session:
             request_payload["withRandomTLSExtensionOrder"] = (
                 self.random_tls_extension_order
             )
-
-        # this is a pointer to the response
         response = request(dumps(request_payload).encode("utf-8"))
         # dereference the pointer to a byte array
         response_bytes = ctypes.string_at(response)
