@@ -32,7 +32,6 @@ class Session:
         pseudo_header_order: Optional[List[str]] = None,
         connection_flow: Optional[int] = None,
         priority_frames: Optional[list] = None,
-        header_order: Optional[List[str]] = None,
         header_priority: Optional[List[str]] = None,
         random_tls_extension_order: Optional = False,
         force_http1: Optional = False,
@@ -259,7 +258,6 @@ class Session:
         #   "key1",
         #   "key2"
         # ]
-        self.header_order = header_order
 
         # Header Priority
         # Example:
@@ -312,7 +310,9 @@ class Session:
         url: str,
         params: Optional[dict] = None,  # Optional[dict[str, str]]
         data: Optional[Union[str, dict]] = None,
-        headers: Optional[dict] = None,  # Optional[dict[str, str]]
+        headers: Optional[
+            dict[str, Union[str, None]]
+        ] = None,  # Optional[dict[str, str]]
         cookies: Optional[dict] = None,  # Optional[dict[str, str]]
         json: Optional[dict] = None,  # Optional[dict]
         allow_redirects: Optional[bool] = False,
@@ -400,6 +400,9 @@ class Session:
 
         # --- Request --------------------------------------------------------------------------------------------------
         is_byte_request = isinstance(request_body, (bytes, bytearray))
+        header_order = list(headers.keys())
+        if "Content-Length" in headers:
+            headers.pop("Content-Length")
         request_payload = {
             "sessionId": self._session_id,
             "followRedirects": allow_redirects,
